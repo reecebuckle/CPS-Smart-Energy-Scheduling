@@ -1,11 +1,10 @@
 # sklearn library
-from sklearn import datasets
 from sklearn import svm
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
 
-# Pandas library
-import pandas
+import pandas # Pandas library
+import os # to delete txt files
 
 # Importing the datasets using pandas
 trainingSet = pandas.read_csv("TrainingDataCSV.csv", sep=',')
@@ -40,8 +39,19 @@ svmClassifier.fit(X_train, Y_train)
 
 # Grab predicted results
 Y_predicted = svmClassifier.predict(X_test)
+print(Y_predicted)
 
 # Print how accurate the model is
 print("Accuracy:", metrics.accuracy_score(Y_test, Y_predicted))
+
+# Use trained classifier on the testing set (100 unlabelled curves)
+predictionResults = svmClassifier.predict(testingSet)
+# Print the prediction results
+print(predictionResults)
+
+# Output a TestingResults.txt file
+os.remove("TestingResults.txt")
+testingSet["Normal"] = predictionResults
+testingSet.to_csv('TestingResults.txt', header=None, index=None, sep=',', mode='a')
 
 
