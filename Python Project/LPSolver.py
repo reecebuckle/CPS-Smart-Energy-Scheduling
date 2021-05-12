@@ -3,14 +3,64 @@ import pandas as pd
 from ortools.linear_solver import pywraplp
 from itertools import groupby
 
-# Unit cost for each hour of an abnormal curve
-curveOne = [4.038200717, 3.874220935, 3.120742561, 3.261642723, 2.990716865, 3.789114849, 3.935849303, 4.39182354,
-            5.356574916, 5.274407608, 5.439402898, 3.823221124, 6.003448749, 4.263088319, 5.8222691, 6.206443924,
-            5.631746969, 6.631983059, 6.593440703, 5.643768061, 5.930986061, 5.421772574, 5.150518763, 5.126661159]
+# Example Normal curve from spread sheet
+normalCurve = (4.246522377,
+               3.640027796,
+               3.480502639,
+               3.245460995,
+               3.162915992,
+               3.597667495,
+               3.905355954,
+               4.078340246,
+               5.374797426,
+               4.944699124,
+               5.438100083,
+               3.909231366,
+               6.200666726,
+               4.482141894,
+               5.410801558,
+               6.149170969,
+               5.8837687,
+               6.329263208,
+               6.469511152,
+               5.58349762,
+               5.558922379,
+               5.255354797,
+               5.568480613,
+               5.441475567
+               )
+
+# Example Abnormal curve from spread sheet
+abnormalCurve = (4.246522377,
+                 3.640027796,
+                 3.480502639,
+                 3.245460995,
+                 3.162915992,
+                 3.597667495,
+                 3.905355954,
+                 4.078340246,
+                 5.374797426,
+                 4.944699124,
+                 5.438100083,
+                 3.909231366,
+                 6.200666726,
+                 4.482141894,
+                 5.410801558,
+                 6.149170969,
+                 5.8837687,
+                 6.329263208,
+                 3.40001,
+                 5.58349762,
+                 5.558922379,
+                 5.255354797,
+                 5.568480613,
+                 5.441475567
+                 )
 
 # Import the 5 users and 50 tasks dataset
-LPDataset = pd.read_csv("UsersCSV.csv", sep=',')
-print(LPDataset.head())
+userTasks = pd.read_csv("UsersTasksCSV.csv", sep=',')
+
+print(userTasks.head())
 
 # Instantiate a Glop solver, naming it SolveStigler.
 solver = pywraplp.Solver.CreateSolver('GLOP')
@@ -18,33 +68,39 @@ solver = pywraplp.Solver.CreateSolver('GLOP')
 # Create solver objective
 objective = solver.Objective()
 
-# Instantiate a dictionary to store all variables at different hours
-variables = dict()
 
-# Create the variables
-for num in range(20, 23 + 1):
-    var = solver.NumVar(0, solver.infinity(), 'x' + str(num))
-    variables[num] = var
+for task, row in userTasks.iterrows():
+    # Instantiate a dictionary to store all variables at different hours
+    variables = dict()
 
-varList = []
-for key in variables:
-    varList.append(variables[key])
+    # Create the variables
+    for num in range(row[1], (row[2] + 1)):
+        var = solver.NumVar(0, solver.infinity(), 'x' + str(num))
+        variables[num] = var
 
-# Add the constraint to the solver
-solver.Add(sum(varList) == 1)
+    varList = []
+    for key in variables:
+        varList.append(variables[key])
+        # Constraint: 0 <= variable for hour <= 1
+        # ( variable is between these bounds and less than maximum scheduled energy per hour )
+        solver.Add(0 <= variables[key] <= row[3])
 
-print(varList)
+    # Constraint: x20 + x21 + x22 + x23 = 3
+    # ( sum of variables is equal to energy demand)
+    solver.Add(sum(varList) == row[4])
 
-for key in variables:
-    objective.SetCoefficient(variables[key], curveOne[key])
+    for key in variables:
+        # print("Var_Hour: " + str(key) + ", Unit Cost: " + str(normalCurve[key]))
+        objective.SetCoefficient(variables[key], abnormalCurve[key-1])
 
 
+
+
+objective.SetMinimization()
 status = solver.Solve()
 
 if status == pywraplp.Solver.OPTIMAL:
     print('Solution:')
     print('Objective value =', solver.Objective().Value())
-
-
 else:
     print('The problem does not have an optimal solution.')
