@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from ortools.linear_solver import pywraplp
+from itertools import groupby
 
 # Unit cost for each hour of an abnormal curve
 curveOne = [4.038200717, 3.874220935, 3.120742561, 3.261642723, 2.990716865, 3.789114849, 3.935849303, 4.39182354,
@@ -14,34 +15,36 @@ print(LPDataset.head())
 # Instantiate a Glop solver, naming it SolveStigler.
 solver = pywraplp.Solver.CreateSolver('GLOP')
 
+# Create solver objective
+objective = solver.Objective()
+
+# Instantiate a dictionary to store all variables at different hours
+variables = dict()
+
 # Create the variables
+for num in range(20, 23 + 1):
+    var = solver.NumVar(0, solver.infinity(), 'x' + str(num))
+    variables[num] = var
 
-x20 = solver.NumVar(0, solver.infinity(), 'x20')
-x21 = solver.NumVar(0, solver.infinity(), 'x21')
-x22 = solver.NumVar(0, solver.infinity(), 'x22')
-x23 = solver.NumVar(0, solver.infinity(), 'x23')
+varList = []
+for key in variables:
+    varList.append(variables[key])
 
-print('Number of variables =', solver.NumVariables())
+# Add the constraint to the solver
+solver.Add(sum(varList) == 1)
 
-# Create the constraints
-# Constraint x20 + x21 + x22 + x23 = 1 (all variables = energy demand)
-solver.Add(x20 + x21 + x22 + x23 == 1)
+print(varList)
 
-print('Number of constraints =', solver.NumConstraints())
+for key in variables:
+    objective.SetCoefficient(variables[key], curveOne[key])
 
 
-# Objective cost function: (h20 * x20) + (h21 * x21) + (h22 * x22) + (h23 * x23)
-solver.Minimize(curveOne[20]*x20 + curveOne[21]*x21 + curveOne[22]*x22 + curveOne[23]*x23)
-
-# Solve the system
 status = solver.Solve()
 
 if status == pywraplp.Solver.OPTIMAL:
     print('Solution:')
     print('Objective value =', solver.Objective().Value())
-    print('x20 =', x20.solution_value())
-    print('x21 =', x21.solution_value())
-    print('x22 =', x22.solution_value())
-    print('x23 =', x23.solution_value())
+
+
 else:
     print('The problem does not have an optimal solution.')
