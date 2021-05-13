@@ -85,9 +85,8 @@ hour = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13'
 plt.bar(hour, costPerHour)
 plt.ylabel("Unit Cost Per Hour")
 plt.xlabel("Hour Starting From")
-plt.title(
-    "Abnormal Curve from Example Spreadsheet \n Min cost solution for all 5 users: "
-    + str(round(solver.Objective().Value(), 2)))
+plt.title("Abnormal Curve from Example Spreadsheet \n Min cost solution for all 5 users: "
+          + str(round(solver.Objective().Value(), 2)))
 
 # plt.show()
 plt.savefig('AbnormalExampleChart.pdf', dpi=300)
