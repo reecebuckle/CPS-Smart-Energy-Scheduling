@@ -1,5 +1,6 @@
 import pandas as pd
 from ortools.linear_solver import pywraplp
+import matplotlib.pyplot as plt
 
 # Example Normal curve from spread sheet
 normalCurve = [4.246522377, 3.640027796, 3.480502639, 3.245460995, 3.162915992, 3.597667495,
@@ -78,4 +79,15 @@ else:
     print('The problem does not have an optimal solution')
 
 # Produce bar char using a list of all the min cost per hour
-print(costPerHour)
+hour = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19',
+        '20', '21', '22', '23']
+
+plt.bar(hour, costPerHour)
+plt.ylabel("Unit Cost Per Hour")
+plt.xlabel("Hour Starting From")
+plt.title(
+    "Abnormal Curve from Example Spreadsheet \n Min cost solution for all 5 users: "
+    + str(round(solver.Objective().Value(), 2)))
+
+# plt.show()
+plt.savefig('AbnormalExampleChart.pdf', dpi=300)
