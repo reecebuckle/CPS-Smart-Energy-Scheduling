@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from ortools.linear_solver import pywraplp
 import matplotlib.pyplot as plt
@@ -91,8 +92,8 @@ hour = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13'
 plt.bar(hour, cost_per_hour)
 plt.ylabel("Total Unit Cost (Consumption)")
 plt.xlabel("Time Slot (Hour)")
-plt.title("Abnormal Curve from Example Spreadsheet \n Min cost solution for all 5 users: "
-          + str(round(solver.Objective().Value(), 2)))
+plt.yticks(np.arange(min(cost_per_hour), max(cost_per_hour) + 1, 1.0))
+plt.title("Abnormal Example Curve \n Min cost solution for all 5 users: " + str(round(solver.Objective().Value(), 2)))
 
 # plt.show()
 plt.savefig('AbnormalExampleChart.png', dpi=300)
