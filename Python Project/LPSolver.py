@@ -90,7 +90,7 @@ for curve_ID, curve_row in abnormal_curves.iterrows():
     plt.ylabel("Total Unit Cost / Consumption")
     plt.xlabel("Time Slot (Hour)")
     plt.yticks(np.arange(min(cost_per_hour), max(cost_per_hour) + 1, 1.0))
-    plt.title("Abnormal Curve #" + str(curve_ID+1) + "\n Min cost solution for all 5 users: "
+    plt.title("Abnormal Curve #" + str(curve_ID+1) + "\nMin cost solution for all 5 users: "
               + str(round(solver.Objective().Value(), 2)))
     plt.savefig("AbnormalCharts/AbnormalCurve"+str(curve_ID+1)+".png")
 
