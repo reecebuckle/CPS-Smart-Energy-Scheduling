@@ -1,24 +1,13 @@
 # CPS-Smart-Energy-Scheduling
 
-In order to run the 5 python scripts in 'Python Project', 
+In order to run the 5 python scripts in 'Python Project', please navigate to 'Python Project', 
+install pip and then run the requirements.txt to install the relevent libraries used in this project
 
-Please have python / pip installed, and the relevent libraries used in this project
-
-This can be installed with: 
+This can be done with: 
 
 python -m pip install -U pip
 
-pip install -U matplotlib
-
-pip install -U scikit-learn
-
-pip install pandas
-
-pip install mlxtend  
-
-pip install numpy
-
-pip install --upgrade --user ortools]
+pip install - r requirements.txt
 
 
 An explanation of the 5 scripts:
